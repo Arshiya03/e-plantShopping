@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { removeItem, updateQuantity } from './CreateSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
@@ -9,18 +9,13 @@ const CartItem = ({ onContinueShopping }) => {
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
-    let total = 0;
-    cart.forEach((item) => {
-      const quantity = item.quantity;
-      const cost = parseFloat(item.cost.substring(1));
-      total += quantity * cost;
-    });
-    return total.toFixed(2);
+    return cart.reduce((total, item) => total + Number(item.cost.substring(1)) * item.quantity, 0);
+ 
   };
 
   const handleContinueShopping = (e) => {
-    e.preventDefault(); // Prevent default form submission if applicable
-    onContinueShopping(e); // Call the function passed from the parent
+    onContinueShopping(e);
+   
   };
 
 
@@ -30,25 +25,22 @@ const CartItem = ({ onContinueShopping }) => {
   };
 
   const handleDecrement = (item) => {
-    if (item.quantity > 1) {
-      dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
-    } else {
-      dispatch(removeItem({ name: item.name }));
-    }
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
+   
   };
 
   const handleRemove = (item) => {
-    dispatch(removeItem({ name: item.name }));
+    dispatch(removeItem(item));
   };
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
-    const cost = parseFloat(item.cost.substring(1)); // Extract numeric cost
-    return (item.quantity * cost).toFixed(2); // Calculate and format
+    return Number(item.cost.substring(1)) * item.quantity;
   };
 
   return (
     <div className="cart-container">
+      <h2 style={{ color: 'black' }}>Total Plants : {cart.length}</h2>
       <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
       <div>
         {cart.map(item => (
@@ -79,5 +71,4 @@ const CartItem = ({ onContinueShopping }) => {
 };
 
 export default CartItem;
-
 
